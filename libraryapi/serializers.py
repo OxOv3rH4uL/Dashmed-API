@@ -23,9 +23,8 @@ class BookSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['title', 'isbn', 'author','publication_date','description']  
     
     def validate_isbn(self, isbn):
-        if not re.match(r"^(?:\d[\-]?){9}[\d|X]$", isbn) and not re.match(r"^(?:97[89])?\d[\-]?\d{5}[\-]?\d{3}[\-]?\d[\-]?(?:\d|X)$", isbn):
+        if not re.match(r"^(97(8|9))?\d{9}(\d|X)$", isbn):
             raise ValueError("Invalid ISBN format.")
-        
         return isbn
         
 
@@ -33,12 +32,9 @@ class BookSerializer(serializers.HyperlinkedModelSerializer):
         if date > datetime.date.today():
             raise serializers.ValidationError("Publication Date cannot be in the future.")
         else:
-            try:
-                datetime.strptime(date, '%Y-%m-%d')
-            except ValueError:
-                raise serializers.ValidationError("Invalid date format. Date should be in YYYY-MM-DD format.")
+            return date
+            
         
-        return date
         
 
 
