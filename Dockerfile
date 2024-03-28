@@ -13,6 +13,6 @@
 
     EXPOSE 8000
 
-    COPY start.sh /
-    RUN chmod +x /start.sh
-    CMD ["/start.sh"]
+    COPY startup.sh /
+    RUN chmod +x /startup.sh
+    CMD ["/startup.sh"]
