@@ -1,4 +1,4 @@
 #!/bin/bash
-python manage.py makemigrations
-python manage.py migrate
-python manage.py runserver 0.0.0.0:8000
+python Django-API/manage.py makemigrations
+python Django-API/manage.py migrate
+python Django-API/manage.py runserver 0.0.0.0:8000
