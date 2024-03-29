@@ -85,7 +85,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': 'root',
         'HOST': '127.0.0.1',  
-        'PORT': '3307',       
+        'PORT': '3306',       
     }
 }
 
@@ -107,6 +107,12 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'libraryapi.pagination.FixedPageSizePagination',
+    'PAGE_SIZE': 100
+}
 
 
 

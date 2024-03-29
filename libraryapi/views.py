@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 import datetime
 import json
+from .pagination import FixedPageSizePagination
 
 class AddBook(APIView):
     def post(self,request):
@@ -18,7 +19,6 @@ class AddBook(APIView):
             serializer = BookSerializer(data=request.data)
             try:
                 if serializer.is_valid(raise_exception=True):
-                    
                     serializer.save()
                     return Response({'message':"Book Added Successfully!"},status=status.HTTP_201_CREATED)
             except ValidationError as e:
@@ -41,28 +41,28 @@ class AddBook(APIView):
     
     def get(self,request):
         token = request.COOKIES.get("jwt_token")
-        print(token)
         if token is not None:
             book = Book.objects.all()
-            serializers = BookSerializer(book,many=True)
-            return Response(serializers.data,status=status.HTTP_200_OK)
+            paginator = FixedPageSizePagination()
+            result = paginator.paginate_queryset(book,request)
+            serializers = BookSerializer(result,many=True)
+            return paginator.get_paginated_response(serializers.data)
         else:
-            return Response({"message":"User Not Authenticated!"},status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message":"User Not Authenticated. Head to /user/login"},status=status.HTTP_401_UNAUTHORIZED)
 
 
 class GetBook(APIView):
     def get(self,request,isbn):
         token = request.COOKIES.get('jwt_token')
-        # print(token)
         if token is not None:
             try:
                 book = Book.objects.get(isbn=isbn)
                 serializers = BookSerializer(book)
                 return Response(serializers.data,status=status.HTTP_200_OK)
             except Book.DoesNotExist:
-                return Response({"message":"BooK Not Found!"},status=status.HTTP_404_NOT_FOUND)
+                return Response({"message":"Book Not Found!"},status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"message":"User Not Authenticated!"},status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message":"User Not Authenticated. Head to /user/login"},status=status.HTTP_401_UNAUTHORIZED)
 
     def put(self,request,isbn):
         token = request.COOKIES.get('jwt_token')
@@ -72,7 +72,6 @@ class GetBook(APIView):
             else:
                 try:
                     get_book = Book.objects.get(isbn=isbn)
-                    request.data['isbn'] = isbn
                     serializers = BookSerializer(get_book,data=request.data,partial=True)
                     if serializers.is_valid():
                         serializers.save()
@@ -81,13 +80,20 @@ class GetBook(APIView):
                         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
                 except Book.DoesNotExist:
                     return Response({"message":"Book Not Found!"},status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"message":"User Not Authenticated. Head to /user/login"},status=status.HTTP_401_UNAUTHORIZED)
         
     
     def delete(self,request,isbn):
-        try:
-            get_book = Book.objects.get(isbn=isbn)
-            serializers = BookSerializer(get_book)
-            serializers.delete(get_book)
-            return Response({"message": "Book deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-        except Book.DoesNotExist:
-            return Response({"message": "Book not found"}, status=status.HTTP_404_NOT_FOUND)
+        token = request.COOKIES.get('jwt_token')
+        if token is not None:
+            try:
+                get_book = Book.objects.get(isbn=isbn)
+                serializers = BookSerializer(get_book)
+                serializers.delete(get_book)
+                return Response({"message": "Book deleted successfully"}, status=status.HTTP_200_OK)
+            except Book.DoesNotExist:
+                return Response({"message": "Book Not Found!"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"message":"User Not Authenticated. Head to /user/login"},status=status.HTTP_401_UNAUTHORIZED)
+        
