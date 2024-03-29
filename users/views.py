@@ -12,7 +12,7 @@ import datetime
 class Register(APIView):
     def post(self,request):
         serializer = UserSerializer(data=request.data)
-        print(serializer)
+        # print(serializer)
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -47,7 +47,6 @@ class Login(APIView):
 
         response = Response()
         response.set_cookie(key='jwt_token',value=token,httponly=True)
-
         response.data = {
             "message":"Login Successful!"
         }
@@ -62,4 +61,9 @@ class Home(APIView):
             return Response({"message":"User Not Authenticated"},status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"message":"To start performing CRUD operations on the Library API, navigate to /libraryapi/books"},status=status.HTTP_200_OK)
-    
+
+class Logout(APIView):
+    def post(self,request):
+        response = Response({"message":"Logout Successfull!"})
+        response.delete_cookie('jwt_token')
+        return response

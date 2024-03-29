@@ -27,20 +27,21 @@ class AddBook(APIView):
                     return Response({'message':"Name should contain only letters , spaces and dots."},status=status.HTTP_400_BAD_REQUEST)
                 
                 elif "Invalid ISBN format." in str(e.detail):
-                    return Response({'message':"Invalid ISBN format."},status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'message':"Invalid ISBN format. The ISBN should be in the format XXX-XXX-XXXX."},status=status.HTTP_400_BAD_REQUEST)
                 
-                elif "Publication Date Cannot be in Future" in str(e.detail):
-                    return Response({"message":"Publication Date Cannot be in Future"},status=status.HTTP_400_BAD_REQUEST)
+                elif "Publication Date Cannot be in future" in str(e.detail):
+                    return Response({"message":"Publication Date Cannot be in Future."},status=status.HTTP_400_BAD_REQUEST)
                 
                 elif "Invalid date format. Date should be in YYYY-MM-DD format." in str(e.detail):
                     return Response({"message":"Invalid date format. Date should be in YYYY-MM-DD format."},status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    return Response({"message":e.detail})
+                    return Response({"message":e.detail},status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'message':"User Not Authenticated. Head to /user/login"},status=status.HTTP_401_UNAUTHORIZED)
     
     def get(self,request):
         token = request.COOKIES.get("jwt_token")
+        print(token)
         if token is not None:
             book = Book.objects.all()
             serializers = BookSerializer(book,many=True)
@@ -52,6 +53,7 @@ class AddBook(APIView):
 class GetBook(APIView):
     def get(self,request,isbn):
         token = request.COOKIES.get('jwt_token')
+        # print(token)
         if token is not None:
             try:
                 book = Book.objects.get(isbn=isbn)

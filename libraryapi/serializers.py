@@ -23,10 +23,10 @@ class BookSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['title', 'isbn', 'author','publication_date','description']  
     
     def validate_isbn(self, isbn):
-        if not re.match(r"^(97(8|9))?\d{9}(\d|X)$", isbn):
-            raise ValueError("Invalid ISBN format.")
+        if not re.match(r"^\d{3}-\d{3}-\d{4}$", isbn):
+            raise serializers.ValidationError("Invalid ISBN format. The ISBN should be in the format XXX-XXX-XXXX.")
         return isbn
-        
+    
 
     def validate_publication_date(self, date):
         if date > datetime.date.today():
