@@ -12,7 +12,6 @@ import datetime
 class Register(APIView):
     def post(self,request):
         serializer = UserSerializer(data=request.data)
-        # print(serializer)
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -28,7 +27,6 @@ class Login(APIView):
     def post(self,request):
         email = request.data['email']
         password = request.data['password']
-        users = User.objects.all()
         user = User.objects.filter(email=email).first()
         if user is None:
             return Response({'error':"User not found"},status=status.HTTP_404_NOT_FOUND)
@@ -43,7 +41,6 @@ class Login(APIView):
         }
 
         token = jwt.encode(data,'secret',algorithm='HS256')
-        # print(token)
 
         response = Response()
         response.set_cookie(key='jwt_token',value=token,httponly=True)
@@ -63,7 +60,12 @@ class Home(APIView):
             return Response({"message":"To start performing CRUD operations on the Library API, navigate to /libraryapi/books"},status=status.HTTP_200_OK)
 
 class Logout(APIView):
-    def post(self,request):
+    def get(self,request):
         response = Response({"message":"Logout Successfull!"})
         response.delete_cookie('jwt_token')
         return response
+
+class InvalidEndPoint(APIView):
+    def get(self,request):
+        return Response({"message":"Page not Found!"},status=status.HTTP_404_NOT_FOUND)
+

@@ -65,7 +65,7 @@ class BookTestCase(TestCase):
         self.assertEqual(content['message'],"Updated Successfully!")
         self.assertEqual(content['data'],self.updated_book_data)
     
-    def test_delete_book(self):
+    def test_delete_book_06(self):
         self.test_add_book_02()
         self.client.cookies['jwt_token'] = self.jwt_token
         response = self.client.delete("http://localhost:8000/api/books/"+self.book_data['isbn']+'/')
@@ -76,6 +76,14 @@ class BookTestCase(TestCase):
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND)
         content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content['message'],"Book Not Found!")
+    
+    def test_invalid_endpoint_07(self):
+        self.register_and_login_user_01()
+        response = self.client.get("http://localhost:8000/api/INVALID")
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND)
+        content = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(content['message'],"Page not Found!")
+
 
 
 class FailureTestCase(TestCase):

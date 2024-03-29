@@ -96,4 +96,8 @@ class GetBook(APIView):
                 return Response({"message": "Book Not Found!"}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({"message":"User Not Authenticated. Head to /user/login"},status=status.HTTP_401_UNAUTHORIZED)
-        
+
+
+class InvalidEndPoint(APIView):
+    def get(self,request):
+        return Response({"message":"Page not Found!"},status=status.HTTP_404_NOT_FOUND)
